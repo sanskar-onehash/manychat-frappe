@@ -1,0 +1,80 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-01-18 11:11:09.883025",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "access_token",
+  "phone_number_id",
+  "column_break_hdtn",
+  "business_account_id",
+  "url",
+  "endpoint"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Password",
+   "in_list_view": 1,
+   "label": "Access Token",
+   "length": 300,
+   "reqd": 1
+  },
+  {
+   "fieldname": "phone_number_id",
+   "fieldtype": "Data",
+   "label": "Phone Number ID"
+  },
+  {
+   "fieldname": "column_break_hdtn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "business_account_id",
+   "fieldtype": "Data",
+   "label": "Business Account ID"
+  },
+  {
+   "fieldname": "url",
+   "fieldtype": "Data",
+   "label": "URL"
+  },
+  {
+   "fieldname": "endpoint",
+   "fieldtype": "Data",
+   "label": "Endpoint"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-18 16:36:34.694466",
+ "modified_by": "Administrator",
+ "module": "Manychat Frappe Integration",
+ "name": "Manychat API Cloud Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
