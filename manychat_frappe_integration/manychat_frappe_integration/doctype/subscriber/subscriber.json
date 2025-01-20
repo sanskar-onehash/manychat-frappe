@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:first_name",
+ "creation": "2025-01-20 11:30:36.933553",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "subscriber_id",
+  "first_name",
+  "last_name",
+  "phone",
+  "whatsapp_number",
+  "email",
+  "has_opt_in_sms",
+  "has_opt_in_email",
+  "consent_phrase"
+ ],
+ "fields": [
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone"
+  },
+  {
+   "fieldname": "whatsapp_number",
+   "fieldtype": "Data",
+   "label": "Whatsapp Number"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "subscriber_id",
+   "fieldtype": "Data",
+   "label": "Subscriber ID"
+  },
+  {
+   "fieldname": "consent_phrase",
+   "fieldtype": "Small Text",
+   "label": "Consent Phrase"
+  },
+  {
+   "default": "1",
+   "fieldname": "has_opt_in_sms",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Opt for SMS"
+  },
+  {
+   "default": "1",
+   "fieldname": "has_opt_in_email",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Opt for Email "
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-20 18:01:30.402887",
+ "modified_by": "Administrator",
+ "module": "Manychat Frappe Integration",
+ "name": "Subscriber",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
