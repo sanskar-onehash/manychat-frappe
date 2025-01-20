@@ -439,25 +439,45 @@ def sync_contact():
         subscriber_id = data.get('id')
         whatsapp_phone = data.get('whatsapp_phone')
         
-        # Create new subscriber
-        doc = frappe.get_doc({
-            "doctype": "Subscriber",
-            "name": first_name,
-            "subscriber_id": subscriber_id,
-            "last_name": last_name,
-            "phone": phone_number,
-            "gender": gender,
-            "email": email,
-            "whatsapp_number": whatsapp_phone,
-        })
+        existing_subscriber = frappe.db.exists("Subscriber", {"subscriber_id": subscriber_id})
         
-        doc.insert()
-        frappe.db.commit()
-        
-        return {
-            "status": "success",
-            "message": "Subscriber created successfully"
-        }
+        if existing_subscriber:
+            doc = frappe.get_doc("Subscriber", existing_subscriber)
+            doc.update({
+                "name": first_name,
+                "last_name": last_name,
+                "phone": phone_number,
+                "gender": gender,
+                "email": email,
+                "whatsapp_number": whatsapp_phone
+            })
+            doc.save()
+            frappe.db.commit()
+            
+            return {
+                "status": "success",
+                "message": "Subscriber updated successfully"
+            }
+        else:
+            # Create new subscriber
+            doc = frappe.get_doc({
+                "doctype": "Subscriber",
+                "name": first_name,
+                "subscriber_id": subscriber_id,
+                "last_name": last_name,
+                "phone": phone_number,
+                "gender": gender,
+                "email": email,
+                "whatsapp_number": whatsapp_phone
+            })
+            
+            doc.insert()
+            frappe.db.commit()
+            
+            return {
+                "status": "success",
+                "message": "Subscriber created successfully"
+            }
             
     except Exception as e:
         frappe.log_error(f"Error creating subscriber: {str(e)}")
