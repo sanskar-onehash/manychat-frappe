@@ -406,21 +406,25 @@ def send_template(**args):
         res = conn.getresponse()
         data = res.read()
         response = json.loads(data.decode("utf-8"))
+        frappe.log_error("response is", response)
         
         if res.status != 200:
             frappe.log_error("Template Sending Error", response)
             return {"status": "error", "message": response.get('message', 'Failed to send template')}
             
-        return {"status": "success", "message": "Flow sent successfully"}
+        return {"status": "success", "message": "Template sent successfully"}
             
     except Exception as e:
-        frappe.log_error("ManyChat Flow Send Error", str(e))
+        frappe.log_error("Template Send Error", str(e))
         return {"status": "error", "message": str(e)}
+    
+    
 
 @frappe.whitelist(allow_guest=True)
 def sync_contact():
     try:
         payload = frappe.request.json
+        frappe.log_error("payload is", payload)
         
         if not payload or 'data' not in payload:
             frappe.log_error("Invalid payload structure")
@@ -439,13 +443,17 @@ def sync_contact():
         subscriber_id = data.get('id')
         whatsapp_phone = data.get('whatsapp_phone')
         
+        frappe.log_error("data is", data)
+        
         existing_subscriber = frappe.db.exists("Subscriber", {"subscriber_id": subscriber_id})
+        frappe.log_error("existing subscriber", existing_subscriber)
         
         if existing_subscriber:
             doc = frappe.get_doc("Subscriber", existing_subscriber)
             doc.update({
                 "name": first_name,
                 "last_name": last_name,
+                "subscriber_id": subscriber_id,
                 "phone": phone_number,
                 "gender": gender,
                 "email": email,

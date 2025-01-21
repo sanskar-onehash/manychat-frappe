@@ -9,12 +9,13 @@
   "subscriber_id",
   "first_name",
   "last_name",
-  "phone",
-  "whatsapp_number",
-  "email",
   "has_opt_in_sms",
   "has_opt_in_email",
-  "consent_phrase"
+  "consent_phrase",
+  "column_break_xxxy",
+  "phone",
+  "whatsapp_number",
+  "email"
  ],
  "fields": [
   {
@@ -51,6 +52,7 @@
   {
    "fieldname": "consent_phrase",
    "fieldtype": "Small Text",
+   "hidden": 1,
    "label": "Consent Phrase"
   },
   {
@@ -66,11 +68,15 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Opt for Email "
+  },
+  {
+   "fieldname": "column_break_xxxy",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-20 18:01:30.402887",
+ "modified": "2025-01-21 09:12:47.249845",
  "modified_by": "Administrator",
  "module": "Manychat Frappe Integration",
  "name": "Subscriber",
