@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:endpoint",
  "creation": "2025-01-18 11:11:09.883025",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -50,15 +51,17 @@
   {
    "fieldname": "endpoint",
    "fieldtype": "Data",
-   "label": "Endpoint"
+   "label": "Endpoint",
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-18 16:36:34.694466",
+ "modified": "2025-01-21 10:17:32.945352",
  "modified_by": "Administrator",
  "module": "Manychat Frappe Integration",
  "name": "Manychat API Cloud Settings",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
