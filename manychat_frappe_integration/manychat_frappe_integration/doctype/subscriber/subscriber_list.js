@@ -56,7 +56,7 @@ frappe.listview_settings["Subscriber"] = {
                     {
                         label: __("Gender"),
                         fieldtype: "Select",
-                        options: "Male\nFemale",
+                        options: "Male\nFemale\nOthers",
                         reqd: 1,
                         fieldname: "gender",
                         placeholder: __("Select gender")
