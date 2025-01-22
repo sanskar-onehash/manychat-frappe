@@ -50,7 +50,6 @@ frappe.listview_settings["Subscriber"] = {
                     {
                         label: __("Email"),
                         fieldtype: "Data",
-                        reqd: 1,
                         fieldname: "email",
                         placeholder: __("Enter email")
                     },
@@ -103,7 +102,6 @@ frappe.listview_settings["Subscriber"] = {
                         return;
                     }
 
-                    // Call the create_subscriber method with the entered values
                     frappe.call({
                         method: "manychat_frappe_integration.manychat_frappe_integration.api.manychat_api.create_subscriber",
                         args: {
@@ -115,7 +113,7 @@ frappe.listview_settings["Subscriber"] = {
                             gender: values.gender,
                             has_opt_in_sms: values.has_opt_in_sms,
                             has_opt_in_email: values.has_opt_in_email,
-                            consent_phrase: values.consent_phrase
+                            consent_phrase: values.consent_phrase,
                         },
                         callback: function (r) {
                             d.hide(); // Close the dialog

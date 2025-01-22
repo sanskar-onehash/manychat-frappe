@@ -6,7 +6,7 @@ import http.client
 import json, re
 import string
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_manychat_templates():
     try:
         tt = frappe.get_all("Manychat API Cloud Settings")
@@ -16,7 +16,6 @@ def get_manychat_templates():
             # Extract values from the document
             url = settings_doc.url
             get_template_endpoint = settings_doc.endpoint
-            # Similarly, get other fields if needed
             phone_number_id = settings_doc.phone_number_id
             
         if not url and not get_template_endpoint:
@@ -33,62 +32,31 @@ def get_manychat_templates():
             'Authorization': f"Bearer {authKey}"
         }
         
-        frappe.log_error("headers are", headers)
-        
-        frappe.log_error("Request details", {
-            'url': url,
-            'endpoint': get_template_endpoint,
-            'headers': headers
-        })
-        
         clean_url = url.replace('https://', '').replace('http://', '')
-
-        # saved_templates = [x.name for x in frappe.get_list("Manychat  Templates")]
         conn = http.client.HTTPSConnection(clean_url)
-        frappe.log_error("conn", conn)
-        
         endpoint = f"/fb/page/{get_template_endpoint}"
-        
         conn.request("GET", endpoint, headers=headers)
-        
         response = conn.getresponse()
-        frappe.log_error("Response status", {
-                'status': response.status,
-                'reason': response.reason
-        })
-
-        # a= conn.request("GET", f"/fb/page/{get_template_endpoint}", headers=headers)
-        # frappe.log_error('a', a)
-        
-        
-        # res = conn.getresponse()
-        # frappe.log_error('res', res)
         
         data = response.read()
-        frappe.log_error('data', data)
-        
         response_data = json.loads(data.decode("utf-8"))
-        frappe.log_error("reposene when fetch", response_data)
-        # parsed_data = parse_templates(response)
         result = create_template_records(response_data)
+        
         return result
+    
     except Exception as e:
         return [False, "Check Manychat Configuration"]
-    
     
 
 def create_template_records(data):
     try:
         if not isinstance(data, dict):
-            frappe.log_error("Invalid data format", data)
             return [False, "Invalid data format received"]
 
         if 'status' not in data or 'data' not in data:
-            frappe.log_error("Missing required response fields", data)
             return [False, "Invalid response structure"]
 
         if data['status'] != 'success':
-            frappe.log_error("API returned non-success status", data)
             return [False, "API request was not successful"]
 
         flows = data.get('data', {}).get('flows', [])
@@ -102,7 +70,6 @@ def create_template_records(data):
             folder_id = template.get('folder_id')
                 
             if not all([template_name, template_id is not None, folder_id is not None]):
-                frappe.log_error(f"Missing required template fields: {template}")
                 continue
 
             existing_template = frappe.db.exists(
@@ -128,27 +95,21 @@ def create_template_records(data):
                 'folder_id': folder_id
             })
 
-        frappe.log_error("templates", template_records)
         return [True, f"Successfully processed {len(template_records)} templates"]  
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Templates Errored")
         return [False, "Failed to Save the Template"]
     
-    
 
 @frappe.whitelist()
-def send_template(doctype, docname, args):
+def check_contact_exists(docname):
     try:
-        # Get ManyChat settings
         settings = frappe.get_all("Manychat API Cloud Settings")
         if not settings:
             return {"status": "error", "message": "ManyChat Service is not configured"}
-            
-        settings_doc = frappe.get_doc("Manychat API Cloud Settings", settings[0]["name"])
         
-        # Extract required settings
+        settings_doc = frappe.get_doc("Manychat API Cloud Settings", settings[0]["name"])
         url = settings_doc.url
-        phone_number_id = settings_doc.phone_number_id
         
         if not url:
             return {"status": "error", "message": "ManyChat Service is not configured properly"}
@@ -163,177 +124,175 @@ def send_template(doctype, docname, args):
         # Prepare headers
         headers = {
             'accept': "application/json",
-            'content-type': "application/json",
-            'Authorization': f"Bearer {auth_token}"
+            'Authorization': f"Bearer {auth_token}",
+            'content-type': "application/json"
         }
-        
-        # Log headers for debugging
-        frappe.log_error("Send template headers", headers)
-        
-        # Get template details
-        template = frappe.get_doc("Manychat Templates", args.get("manychat_templates"))
-        if not template:
-            return {"status": "error", "message": "Template not found"}
-            
-        # Get document details
-        doc = frappe.get_doc(doctype, docname)
-        if not doc:
-            return {"status": "error", "message": "Document not found"}
-            
-        # Prepare payload
-        payload = {
-            "subscriber_id": doc.subscriber_id,
-            "flow_ns": template.template_id
-        }
-        
-        # Log request details
-        frappe.log_error("Send template request details", {
-            'url': url,
-            'endpoint': '/fb/sending/sendFlow',
-            'payload': payload
-        })
         
         # Prepare connection
         clean_url = url.replace('https://', '').replace('http://', '')
         conn = http.client.HTTPSConnection(clean_url)
         
-        # Make request
-        endpoint = "/fb/sending/sendFlow"
-        conn.request("POST", endpoint, body=json.dumps(payload), headers=headers)
+        # Get the lead document
+        lead_doc = frappe.get_doc("Lead", docname)
         
-        # Get response
-        response = conn.getresponse()
+        # Get phone number from lead and remove '+' if present
+        phone = lead_doc.mobile_no
+        if not phone:
+            return {"status": "error", "message": "Phone number is not set for this contact"}
         
-        # Log response status
-        frappe.log_error("Send template response status", {
-            'status': response.status,
-            'reason': response.reason
-        })
+        phone = phone.replace('+', '').replace(' ', '')
+        if not phone.startswith('91'):
+            phone = f"91{phone}"
         
-        # Read and parse response
-        data = response.read()
-        response_data = json.loads(data.decode("utf-8"))
+        # Use the provided WhatsappID field_id directly
+        whatsapp_field_id = 12373759
         
-        # Log response data
-        frappe.log_error("Send template response", response_data)
+        # Use findByCustomField API to check contact existence
+        find_by_custom_field_endpoint = f"/fb/subscriber/findByCustomField?field_id={whatsapp_field_id}&field_value={phone}"
+        conn.request("GET", find_by_custom_field_endpoint, headers=headers)
+        find_response = conn.getresponse()
         
-        # Check response status
-        if response.status == 200:
-            return {"status": "success", "message": "WhatsApp message sent successfully"}
-        else:
-            error_message = response_data.get('message', 'Unknown error occurred')
-            return {"status": "error", "message": error_message}
+        find_response_data = json.loads(find_response.read().decode("utf-8"))
+        
+        if find_response.status == 200 and find_response_data.get("status") == "success":
+            subscriber_data = None
             
-    except Exception as e:
-        frappe.log_error(title="ManyChat Send Template Error", message=str(e))
-        return {"status": "error", "message": "Error sending WhatsApp message"}
+            if find_response_data.get("data") and len(find_response_data["data"]) > 0:
+                subscriber_data = find_response_data["data"][0]
+
+            if subscriber_data and subscriber_data.get("id"):
+                subscriber_id = subscriber_data["id"]
+                frappe.db.set_value("Lead", docname, {
+                    "subscriber_id": subscriber_id,
+                })
+                frappe.db.commit()
+            
+            if find_response_data.get("data"):
+                return {
+                    "status": "success",
+                    "message": "Contact exists in ManyChat",
+                    "exists": True,
+                    "phone": phone,
+                    "contact_data": find_response_data.get("data")[0] 
+                }
+            else:
+                return {
+                    "status": "success",  
+                    "message": "Contact does not exist in ManyChat",
+                    "exists": False,
+                    "phone": phone
+                }
+                
+        return {"status": "error", "message": "Failed to fetch contact from ManyChat"}
     
+    except Exception as e:
+        frappe.log_error(title="ManyChat Contact Integration Error", message=str(e))
+        return {"status": "error", "message": str(e)}
     
 
 @frappe.whitelist()
-def create_subscriber(first_name, last_name, phone, gender, email, has_opt_in_sms, has_opt_in_email, consent_phrase, whatsapp_number=None):
+def create_subscriber(first_name, last_name, phone, gender, has_opt_in_sms, has_opt_in_email, consent_phrase, doctype=None, docname=None, whatsapp_phone=None, email=None):
     try:
         # Get ManyChat settings
         settings = frappe.get_all("Manychat API Cloud Settings")
         if not settings:
             return "ManyChat Service is not configured"
-            
+        
         settings_doc = frappe.get_doc("Manychat API Cloud Settings", settings[0]["name"])
-        
-        # Extract required settings
         url = settings_doc.url
-        
         if not url:
             return "ManyChat Service is not configured properly"
-        
+
         # Get decrypted auth token
         auth_token = frappe.utils.password.get_decrypted_password(
-            "Manychat API Cloud Settings",
-            settings[0]["name"],
-            "access_token"
+            "Manychat API Cloud Settings", settings[0]["name"], "access_token"
         )
-        
-        frappe.log_error("auth_token", auth_token)
-        
+
         # Prepare headers
         headers = {
             'accept': "application/json",
             'content-type': "application/json",
             'Authorization': f"Bearer {auth_token}"
         }
-        
-        # Prepare payload
+
+        # Prepare payload matching the required format
         payload = {
             "first_name": first_name,
             "last_name": last_name,
             "phone": phone,
-            "whatsapp_phone": whatsapp_number if whatsapp_number else phone,
+            "whatsapp_phone": whatsapp_phone if whatsapp_phone else phone,
             "gender": gender,
             "email": email,
             "has_opt_in_sms": has_opt_in_sms,
             "has_opt_in_email": has_opt_in_email,
             "consent_phrase": consent_phrase
         }
-        
-        
-        # Log request details
-        frappe.log_error("Create subscriber request details", {
-            'url': url,
-            'endpoint': '/fb/subscriber/createSubscriber',
-            'payload': payload
-        })
-        
-        # Prepare connection
+
+
+        # Make request to ManyChat
         clean_url = url.replace('https://', '').replace('http://', '')
         conn = http.client.HTTPSConnection(clean_url)
+        conn.request("POST", "/fb/subscriber/createSubscriber", body=json.dumps(payload), headers=headers)
         
-        # Make request
-        endpoint = "/fb/subscriber/createSubscriber"
-        conn.request("POST", endpoint, body=json.dumps(payload), headers=headers)
-        
-        # Get response
         response = conn.getresponse()
         response_data = json.loads(response.read().decode("utf-8"))
-        
-        # Log response
-        frappe.log_error("Create subscriber response", response_data)
-        
+
         if response.status == 200 and response_data.get("status") == "success":
-            # Create new subscriber document
-            subscriber = frappe.get_doc({
-                "doctype": "Subscriber",
-                "first_name": first_name,
-                "last_name": last_name,
-                "phone": phone,
-                "whatsapp_number": whatsapp_number if whatsapp_number else phone,
-                "subscriber_id": response_data["data"].get("id"),
-                "gender": response_data["data"].get("gender"),
-                "email": email
-                # "page_id": response_data["data"].get("page_id"),
-                # "profile_pic": response_data["data"].get("profile_pic"),
-                # "locale": response_data["data"].get("locale"),
-                # "language": response_data["data"].get("language"),
-                # "timezone": response_data["data"].get("timezone"),
-                # "optin_phone": response_data["data"].get("optin_phone", 0),
-                # "optin_whatsapp": response_data["data"].get("optin_whatsapp", 0),
-                # "subscribed_date": datetime.now(),
-                # "last_interaction": response_data["data"].get("last_interaction"),
-                # "last_seen": response_data["data"].get("last_seen"),
-                # "is_followup_enabled": response_data["data"].get("is_followup_enabled", 0)
-            })
+            subscriber_id = response_data["data"].get("id")
             
-            subscriber.insert(ignore_permissions=True)
-            frappe.db.commit()
+            if doctype == "Lead":
+                # For Lead doctype, only update the subscriber_id
+                frappe.db.set_value("Lead", docname, {
+                    "subscriber_id": subscriber_id,
+                })
+                frappe.db.commit()
+            else:
+                # Check for existing subscriber with the same phone number
+                existing_subscriber = frappe.get_all(
+                    "Subscriber",
+                    filters={"whatsapp_number": whatsapp_phone if whatsapp_phone else phone},
+                    fields=["name", "subscriber_id"]
+                )
+                
+                if existing_subscriber:
+                    frappe.db.set_value("Subscriber", docname, "subscriber_id", existing_subscriber[0].subscriber_id)
+                    frappe.db.commit()
+                    return "Updated existing subscriber"
+    
+                # For subscriber doctypes, create new subscriber document
+                else:
+                    subscriber = frappe.get_doc({
+                        "doctype": "Subscriber",
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "phone": phone,
+                        "whatsapp_number": whatsapp_phone if whatsapp_phone else phone,
+                        "subscriber_id": subscriber_id,
+                        "gender": response_data["data"].get("gender"),
+                        "email": email
+                    })
+                    subscriber.insert(ignore_permissions=True)
+                    frappe.db.commit()
             
             return "success"
         else:
-            error_message = response_data.get('message', 'Unknown error occurred')
-            return error_message
+            error_details = response_data.get('details', {})
+            error_messages = []
             
+            if 'messages' in error_details:
+                for field, errors in error_details['messages'].items():
+                    if isinstance(errors, dict) and 'message' in errors:
+                        error_messages.append(f"{field}: {errors['message']}")
+                    elif isinstance(errors, list):
+                        error_messages.append(f"{field}: {', '.join(errors)}")
+            
+            error_message = ' | '.join(error_messages) if error_messages else response_data.get('message', 'Unknown error occurred')
+            return f"Error: {error_message}"
+
     except Exception as e:
         frappe.log_error(title="ManyChat Create Subscriber Error", message=str(e))
         return str(e)
-    
+
 
 @frappe.whitelist()
 def send_template(**args):
@@ -393,9 +352,6 @@ def send_template(**args):
             "flow_ns": template.template_id
         }
         
-        frappe.log_error("payload is", payload)
-        frappe.log_error("headers is", headers)
-        
         conn.request(
             "POST", 
             f"/fb/sending/sendFlow", 
@@ -406,10 +362,8 @@ def send_template(**args):
         res = conn.getresponse()
         data = res.read()
         response = json.loads(data.decode("utf-8"))
-        frappe.log_error("response is", response)
         
         if res.status != 200:
-            frappe.log_error("Template Sending Error", response)
             return {"status": "error", "message": response.get('message', 'Failed to send template')}
             
         return {"status": "success", "message": "Template sent successfully"}
@@ -420,7 +374,7 @@ def send_template(**args):
     
     
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def sync_contact():
     try:
         payload = frappe.request.json

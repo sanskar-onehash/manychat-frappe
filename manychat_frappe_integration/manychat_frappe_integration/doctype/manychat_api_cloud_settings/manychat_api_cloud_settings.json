@@ -57,11 +57,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-21 10:17:32.945352",
+ "modified": "2025-01-21 10:22:51.789135",
  "modified_by": "Administrator",
  "module": "Manychat Frappe Integration",
  "name": "Manychat API Cloud Settings",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
