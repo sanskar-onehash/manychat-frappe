@@ -174,8 +174,8 @@ function create_manychat_contact(frm, values) {
 
     // Remove the '+' from country code and combine with phone numbers
     const countryCode = values.country_code.replace('+', '');
-    const fullPhone = countryCode + trimmedPhone;
-    const fullWhatsApp = countryCode + trimmedWhatsApp;
+    const fullPhone = trimmedPhone.startsWith(countryCode) ? trimmedPhone : countryCode + trimmedPhone;
+    const fullWhatsApp = trimmedWhatsApp.startsWith(countryCode) ? trimmedWhatsApp : countryCode + trimmedWhatsApp;
 
     frappe.call({
         method: "manychat_frappe_integration.manychat_frappe_integration.api.manychat_api.create_subscriber",
