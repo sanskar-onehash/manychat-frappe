@@ -399,11 +399,11 @@ def sync_contact():
         
         frappe.log_error("data is", data)
         
-        existing_subscriber = frappe.db.exists("Subscriber", {"subscriber_id": subscriber_id})
-        frappe.log_error("existing subscriber", existing_subscriber)
+        existing_lead = frappe.db.exists("Lead", {"subscriber_id": subscriber_id})
+        frappe.log_error("existing lead", existing_lead)
         
-        if existing_subscriber:
-            doc = frappe.get_doc("Subscriber", existing_subscriber)
+        if existing_lead:
+            doc = frappe.get_doc("Lead", existing_lead)
             doc.update({
                 "name": first_name,
                 "last_name": last_name,
@@ -411,26 +411,28 @@ def sync_contact():
                 "phone": phone_number,
                 "gender": gender,
                 "email": email,
-                "whatsapp_number": whatsapp_phone
+                "whatsapp_number": whatsapp_phone,
+                "source": "Manychat"
             })
             doc.save()
             frappe.db.commit()
             
             return {
                 "status": "success",
-                "message": "Subscriber updated successfully"
+                "message": "Lead updated successfully"
             }
         else:
             # Create new subscriber
             doc = frappe.get_doc({
-                "doctype": "Subscriber",
+                "doctype": "Lead",
                 "name": first_name,
                 "subscriber_id": subscriber_id,
                 "last_name": last_name,
                 "phone": phone_number,
                 "gender": gender,
                 "email": email,
-                "whatsapp_number": whatsapp_phone
+                "whatsapp_number": whatsapp_phone,
+                "source": "Manychat"
             })
             
             doc.insert()
@@ -438,11 +440,11 @@ def sync_contact():
             
             return {
                 "status": "success",
-                "message": "Subscriber created successfully"
+                "message": "Lead created successfully"
             }
             
     except Exception as e:
-        frappe.log_error(f"Error creating subscriber: {str(e)}")
+        frappe.log_error(f"Error creating Lead: {str(e)}")
         return {
             "status": "error",
             "message": str(e)
