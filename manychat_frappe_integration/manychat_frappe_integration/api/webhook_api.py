@@ -23,6 +23,9 @@ def handle_webhook():
     if existing_lead:
         lead = frappe.get_doc("Lead", existing_lead[0].name)
         
+        if email_id:
+            lead.email_id = email_id
+        
         if event_type == "USER_BUYS_COURSE":
             lead.event_ = "Bought Course"
             if course_name:
@@ -47,7 +50,8 @@ def handle_webhook():
             lead.event_ = "Registered for workshop"
             if webinar_name:
                 lead.webinar_name = webinar_name
-
+                
+        lead.flags.ignore_email_validation = True
         lead.save(ignore_permissions=True)
     
     else:                
@@ -85,6 +89,7 @@ def handle_webhook():
                     "course_name": course_name
                 })
                 
+        lead.flags.ignore_email_validation = True
         lead.insert(ignore_permissions=True)
     
     frappe.db.commit()
