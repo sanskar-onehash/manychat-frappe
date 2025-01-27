@@ -380,24 +380,13 @@ def sync_contact():
         payload = frappe.request.json
         frappe.log_error("payload is", payload)
         
-        if not payload or 'data' not in payload:
-            frappe.log_error("Invalid payload structure")
-            return {
-                "status": "error",
-                "message": "Invalid payload structure"
-            }
-        
-        # Extract data from the payload's data field
-        data = payload['data']
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        email = data.get('email')
-        gender = data.get('gender')
-        phone_number = data.get('phone')
-        subscriber_id = data.get('id')
-        whatsapp_phone = data.get('whatsapp_phone')
-        
-        frappe.log_error("data is", data)
+        first_name = payload.get('first_name')
+        last_name = payload.get('last_name')
+        email = payload.get('email')
+        gender = payload.get('gender')
+        phone_number = payload.get('phone')
+        subscriber_id = payload.get('id')
+        whatsapp_id = payload.get('custom_fields', {}).get('WhatsappID')
         
         existing_lead = frappe.db.exists("Lead", {"subscriber_id": subscriber_id})
         frappe.log_error("existing lead", existing_lead)
@@ -405,16 +394,16 @@ def sync_contact():
         if existing_lead:
             doc = frappe.get_doc("Lead", existing_lead)
             doc.update({
-                "name": first_name,
+                "first_name": first_name,
                 "last_name": last_name,
                 "subscriber_id": subscriber_id,
                 "phone": phone_number,
                 "gender": gender,
                 "email": email,
-                "whatsapp_number": whatsapp_phone,
+                "mobile_no": whatsapp_id,
                 "source": "Manychat"
             })
-            doc.save()
+            doc.insert(ignore_permissions=True)
             frappe.db.commit()
             
             return {
@@ -425,17 +414,17 @@ def sync_contact():
             # Create new subscriber
             doc = frappe.get_doc({
                 "doctype": "Lead",
-                "name": first_name,
+                "first_name": first_name,
                 "subscriber_id": subscriber_id,
                 "last_name": last_name,
                 "phone": phone_number,
                 "gender": gender,
                 "email": email,
-                "whatsapp_number": whatsapp_phone,
+                "mobile_no": whatsapp_id,
                 "source": "Manychat"
             })
             
-            doc.insert()
+            doc.insert(ignore_permissions=True)
             frappe.db.commit()
             
             return {
