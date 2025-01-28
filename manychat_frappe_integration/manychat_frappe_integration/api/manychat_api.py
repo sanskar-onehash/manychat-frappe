@@ -378,7 +378,6 @@ def send_template(**args):
 def sync_contact():
     try:
         payload = frappe.request.json
-        frappe.log_error("payload is", payload)
         
         first_name = payload.get('first_name')
         last_name = payload.get('last_name')
@@ -389,7 +388,6 @@ def sync_contact():
         whatsapp_id = payload.get('custom_fields', {}).get('WhatsappID')
         
         existing_lead = frappe.db.exists("Lead", {"subscriber_id": subscriber_id})
-        frappe.log_error("existing lead", existing_lead)
         
         if existing_lead:
             doc = frappe.get_doc("Lead", existing_lead)
