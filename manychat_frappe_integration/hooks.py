@@ -137,6 +137,10 @@ page_js = {"page" : "public/js/subscriber.js"}
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 
+override_doctype_class = {
+	"Notification": "manychat_frappe_integration.manychat_frappe_integration.overrides.notification.SendNotification"
+}
+
 # Document Events
 # ---------------
 # Hook on document methods and events
