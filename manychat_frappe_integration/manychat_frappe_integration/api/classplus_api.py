@@ -3,7 +3,6 @@ import frappe
 @frappe.whitelist(allow_guest=True)
 def handle_webhook():
     data = frappe.request.json
-    frappe.log_error("data is", data)
 
     first_name = data.get("name")
     mobile_no = data.get("number")
@@ -16,8 +15,6 @@ def handle_webhook():
         filters={"mobile_no": mobile_no},
         limit=1
     )
-    
-    frappe.log_error("existing lead", existing_lead)
 
     if existing_lead:
         lead = frappe.get_doc("Lead", existing_lead[0].name)
@@ -48,9 +45,7 @@ def handle_webhook():
         elif event_type == "WEBINAR_LANDING_PAGE_USER_REGISTERS_FOR_WORKSHOP":
             lead.event_ = "Registered for workshop"
             if webinar_name:
-                lead.webinar_name = webinar_name
-          
-        frappe.log_error("existing lead is", lead)      
+                lead.webinar_name = webinar_name     
         
         lead.flags.ignore_email_validation = True
         lead.save(ignore_permissions=True)
@@ -91,12 +86,9 @@ def handle_webhook():
                     "course_name": course_name
                 })
                 
-        frappe.log_error("else lead is", lead)
                 
         lead.flags.ignore_email_validation = True
         lead.insert(ignore_permissions=True)
         frappe.db.commit()
-        
-        frappe.log_error("else lead 1 is", lead)
     
     return {"status": "success", "message": "Lead processed successfully!"}
