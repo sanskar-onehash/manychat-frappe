@@ -1,4 +1,5 @@
 import frappe
+from datetime import datetime
 
 @frappe.whitelist(allow_guest=True)
 def handle_webhook():
@@ -10,6 +11,7 @@ def handle_webhook():
     course_name = data.get("course_name")
     webinar_name = data.get("webinar_name")
     event_type = data.get("eventType")
+    current_time = datetime.now()
         
     existing_lead = frappe.get_list("Lead", 
         filters={"mobile_no": mobile_no},
@@ -26,14 +28,16 @@ def handle_webhook():
             lead.event_ = "Bought Course"
             if course_name:
                 lead.append("course", {
-                    "course_name": course_name
+                    "course_name": course_name,
+                    "time": current_time
                 })
         
         elif event_type == "USER_DROPS_FROM_PAYMENT_PAGE":
             lead.event_ = "Dropped from payment page"
             if course_name:
                 lead.append("dropped_payment_page_courses", {
-                    "course_name": course_name
+                    "course_name": course_name,
+                    "time": current_time
                     })
                 
             if webinar_name:
@@ -79,11 +83,13 @@ def handle_webhook():
         if course_name:
             if event_type == "USER_BUYS_COURSE":
                 lead.append("course", {
-                    "course_name": course_name
+                    "course_name": course_name,
+                    "time": current_time
                 })
             elif event_type == "USER_DROPS_FROM_PAYMENT_PAGE":
                 lead.append("dropped_payment_page_courses", {
-                    "course_name": course_name
+                    "course_name": course_name,
+                    "time": current_time
                 })
                 
                 
