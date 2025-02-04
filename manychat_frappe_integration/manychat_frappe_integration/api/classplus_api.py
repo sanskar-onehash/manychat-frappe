@@ -1,5 +1,4 @@
 import frappe
-from datetime import datetime
 
 @frappe.whitelist(allow_guest=True)
 def handle_webhook():
@@ -11,7 +10,7 @@ def handle_webhook():
     course_name = data.get("course_name")
     webinar_name = data.get("webinar_name")
     event_type = data.get("eventType")
-    current_time = datetime.now()
+    current_time = frappe.utils.now()
         
     existing_lead = frappe.get_list("Lead", 
         filters={"mobile_no": mobile_no},
