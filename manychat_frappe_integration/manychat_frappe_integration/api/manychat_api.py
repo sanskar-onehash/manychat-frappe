@@ -50,6 +50,8 @@ def get_manychat_templates():
 
 def create_template_records(data):
     try:
+        TARGET_FOLDER_ID = 27451007
+        
         if not isinstance(data, dict):
             return [False, "Invalid data format received"]
 
@@ -70,6 +72,9 @@ def create_template_records(data):
             folder_id = template.get('folder_id')
                 
             if not all([template_name, template_id is not None, folder_id is not None]):
+                continue
+            
+            if folder_id != TARGET_FOLDER_ID:
                 continue
 
             existing_template = frappe.db.exists(
