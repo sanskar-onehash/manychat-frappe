@@ -392,7 +392,11 @@ def sync_contact():
         subscriber_id = payload.get('id')
         whatsapp_id = payload.get('custom_fields', {}).get('WhatsappID')
         
+        existing_lead = None
         existing_lead = frappe.db.exists("Lead", {"subscriber_id": subscriber_id})
+        
+        if not existing_lead and whatsapp_id:
+            existing_lead = frappe.db.exists("Lead", {"mobile_no": whatsapp_id})
         
         if existing_lead:
             doc = frappe.get_doc("Lead", existing_lead)
