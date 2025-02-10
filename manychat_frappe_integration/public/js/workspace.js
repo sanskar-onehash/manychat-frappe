@@ -75,8 +75,7 @@ function showLeadDialog(leadName) {
                         <p>Click below to view the lead:</p>
                         <a href="/app/lead/${leadName}"
                            class="btn btn-primary btn-sm" 
-                           onclick="cur_dialog.hide()"
-                           style="color: grey; text-decoration: none;">
+                           onclick="cur_dialog.hide()">
                             View Lead: ${leadName}
                         </a>
                     </div>
