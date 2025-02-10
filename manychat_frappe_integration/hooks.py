@@ -28,6 +28,9 @@ app_license = "mit"
 # app_include_css = "/assets/manychat_frappe_integration/css/manychat_frappe_integration.css"
 # app_include_js = "/assets/frappe_meta_integration/js/toolbar.js"
 app_include_js = "/assets/manychat_frappe_integration/js/toolbar.js"
+app_include_js = [
+    "/assets/manychat_frappe_integration/js/workspace.js"
+]
 # app_include_js = "/assets/manychat_frappe_integration/js/list_view.js"
 # app_include_js = "/assets/manychat_frappe_integration/js/subscriber.js"
 
