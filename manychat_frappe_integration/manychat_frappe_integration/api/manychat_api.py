@@ -276,7 +276,7 @@ def create_subscriber(first_name, last_name, phone, gender, has_opt_in_sms, has_
                         "gender": response_data["data"].get("gender"),
                         "email": email
                     })
-                    subscriber.insert(ignore_permissions=True)
+                    subscriber.save(ignore_permissions=True)
                     frappe.db.commit()
             
             return "success"
@@ -406,7 +406,7 @@ def sync_contact():
                 "mobile_no": whatsapp_id,
                 "source": "Manychat"
             })
-            doc.insert(ignore_permissions=True)
+            doc.save(ignore_permissions=True)
             frappe.db.commit()
             
             return {
@@ -427,7 +427,7 @@ def sync_contact():
                 "source": "Manychat"
             })
             
-            doc.insert(ignore_permissions=True)
+            doc.save(ignore_permissions=True)
             frappe.db.commit()
             
             return {
