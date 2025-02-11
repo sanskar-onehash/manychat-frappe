@@ -10,12 +10,27 @@ $(document).ready(function () {
                 refresh(frm) {
                     if (!ignored_doctype_list.includes(frm.doc.doctype)) {
                         frm.add_custom_button(__('Send via WhatsApp'), function () { send_sms(frm); });
+                        frm.page.add_menu_item(__('Open ManyChat Contact'), function () {
+                            open_manychat_contact(frm);
+                        });
+  
                     }
                 }
             });
         }
     });
 });
+
+function open_manychat_contact(frm) {
+    if (frm.doc.subscriber_id) {
+        console.log("i am heree if")
+        let manychat_url = `https://app.manychat.com/fb1779538/chat/${frm.doc.subscriber_id}`;
+        window.open(manychat_url, '_blank'); // Open in new tab
+    } else {
+        console.log("i am heree else")
+        frappe.msgprint(__('Subscriber ID is missing.'));
+    }
+}
 
 function send_sms(frm) {
     if (frm.is_dirty()) {
@@ -324,3 +339,15 @@ function dialog_primary_action(frm, values) {
         }
     });
 }
+
+
+frappe.ui.form.on('Lead', {
+    refresh: function (frm) {
+        // Add menu item for WhatsApp Web
+        frm.page.add_menu_item(__('WhatsApp Web'), function () {
+            // Replace with the correct ManyChat or WhatsApp link
+            var whatsappUrl = "https://wa.me/yourwhatsappphonenumber";
+            window.open(whatsappUrl, '_blank');
+        });
+    }
+});
