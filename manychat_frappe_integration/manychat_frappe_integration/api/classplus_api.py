@@ -20,6 +20,11 @@ def handle_webhook():
     if existing_lead:
         lead = frappe.get_doc("Lead", existing_lead[0].name)
         
+        lead.source = "Classplus"
+        lead.first_name = first_name
+        if email_id:
+            lead.email_id = email_id
+        
         if email_id:
             lead.email_id = email_id
         
