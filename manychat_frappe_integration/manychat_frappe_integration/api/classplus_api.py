@@ -19,8 +19,6 @@ def handle_webhook():
         limit=1
     )
 
-    frappe.log_error("Existing lead:", existing_lead)
-
     if existing_lead:
         lead = frappe.get_doc("Lead", existing_lead[0].name)
         
@@ -33,7 +31,6 @@ def handle_webhook():
             lead.email_id = email_id
         
         if event_type == "USER_BUYS_COURSE":
-            frappe.log_error("User buys course")
             lead.event_ = "Bought Course"
             if course_name:
                 lead.append("course", {
@@ -77,7 +74,6 @@ def handle_webhook():
             lead_doc["event_"] = "Signed up on the app"
             
         elif event_type == "USER_BUYS_COURSE":
-            frappe.log_error("New user buys course")
             lead_doc["event_"] = "Bought Course"
             
         elif event_type == "USER_DROPS_FROM_PAYMENT_PAGE":
@@ -92,7 +88,6 @@ def handle_webhook():
         
         if course_name:
             if event_type == "USER_BUYS_COURSE":
-                frappe.log_error("User course purchase")
                 lead.append("course", {
                     "course_name": course_name,
                     "time": current_time
