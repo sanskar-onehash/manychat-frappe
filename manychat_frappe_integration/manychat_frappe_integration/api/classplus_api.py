@@ -33,10 +33,20 @@ def handle_webhook():
         if event_type == "USER_BUYS_COURSE":
             lead.event_ = "Bought Course"
             if course_name:
-                lead.append("course", {
-                    "course_name": course_name,
-                    "time": current_time
-                })
+                # Check if course already exists
+                course_exists = False
+                for c in lead.course:
+                    if c.course_name == course_name:
+                        course_exists = True
+                        frappe.log_error(f"Duplicate course entry prevented: {course_name} for lead {lead.name}")
+                        break
+                
+                # Only append if course doesn't exist
+                if not course_exists:
+                    lead.append("course", {
+                        "course_name": course_name,
+                        "time": current_time
+                    })
         
         elif event_type == "USER_DROPS_FROM_PAYMENT_PAGE":
             lead.event_ = "Dropped from payment page"
