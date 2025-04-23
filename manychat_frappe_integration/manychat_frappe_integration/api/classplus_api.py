@@ -37,8 +37,8 @@ def handle_webhook():
                 course_exists = False
                 for c in lead.course:
                     if c.course_name == course_name:
+                        c.time = current_time
                         course_exists = True
-                        frappe.log_error(f"Duplicate course entry prevented: {course_name} for lead {lead.name}")
                         break
                 
                 # Only append if course doesn't exist
