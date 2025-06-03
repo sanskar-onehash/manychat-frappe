@@ -6,7 +6,7 @@ from frappe.email.doctype.notification.notification import get_context
 from manychat_frappe_integration.app_config import APP_TITLE
 
 
-def manhychat_validate(notificaiton_doc):
+def manychat_validate(notificaiton_doc):
     pass
 
 

@@ -159,10 +159,10 @@ after_uninstall = "manychat_frappe_integration.uninstall.after_uninstall"
 # WhatsApp Notification
 # ---------------
 whatsapp_notification_validate = [
-    "manychat_frappe_integration.overrides.notification.manychat_validate"
+    "manychat_frappe_integration.manychat_frappe_integration.overrides.notification.manychat_validate"
 ]
 whatsapp_notification_send = [
-    "manychat_frappe_integration.overrides.notification.manychat_send"
+    "manychat_frappe_integration.manychat_frappe_integration.overrides.notification.manychat_send"
 ]
 
 # Scheduled Tasks
