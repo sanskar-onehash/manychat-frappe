@@ -47,7 +47,7 @@ app_include_js = "/assets/manychat_frappe_integration/js/toolbar.js"
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
-page_js = {"page" : "public/js/subscriber.js"}
+page_js = {"page": "public/js/subscriber.js"}
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -90,13 +90,13 @@ page_js = {"page" : "public/js/subscriber.js"}
 # ------------
 
 # before_install = "manychat_frappe_integration.install.before_install"
-# after_install = "manychat_frappe_integration.install.after_install"
+after_install = "manychat_frappe_integration.install.after_install"
 
 # Uninstallation
 # ------------
 
 # before_uninstall = "manychat_frappe_integration.uninstall.before_uninstall"
-# after_uninstall = "manychat_frappe_integration.uninstall.after_uninstall"
+after_uninstall = "manychat_frappe_integration.uninstall.after_uninstall"
 
 # Integration Setup
 # ------------------
@@ -140,9 +140,9 @@ page_js = {"page" : "public/js/subscriber.js"}
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 
-override_doctype_class = {
-	"Notification": "manychat_frappe_integration.manychat_frappe_integration.overrides.notification.SendNotification"
-}
+# override_doctype_class = {
+# 	"Notification": "manychat_frappe_integration.manychat_frappe_integration.overrides.notification.SendNotification"
+# }
 
 # Document Events
 # ---------------
@@ -155,6 +155,15 @@ override_doctype_class = {
 # 		"on_trash": "method"
 # 	}
 # }
+
+# WhatsApp Notification
+# ---------------
+whatsapp_notification_validate = [
+    "manychat_frappe_integration.overrides.notification.manychat_validate"
+]
+whatsapp_notification_send = [
+    "manychat_frappe_integration.overrides.notification.manychat_send"
+]
 
 # Scheduled Tasks
 # ---------------
@@ -252,4 +261,3 @@ override_doctype_class = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
