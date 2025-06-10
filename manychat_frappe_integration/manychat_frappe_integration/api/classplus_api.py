@@ -4,8 +4,6 @@ import frappe
 def handle_webhook():
     data = frappe.request.json
 
-    frappe.log_error("Received webhook data:", data)
-
     first_name = data.get("name")
     mobile_no = data.get("number")
     email_id = data.get("email")
